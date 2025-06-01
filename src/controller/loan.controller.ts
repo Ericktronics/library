@@ -6,9 +6,18 @@ import { epochToDate } from "../utils/epochToDateConverter";
 export const getLoans = async (req: Request, res: Response): Promise<void> => {
   try {
     const loans = await db.Loan.findAll({
+      attributes: { exclude: ["book_id", "member_id"] },
       include: [
-        { model: db.Book, as: "book" },
-        { model: db.Member, as: "member" },
+        {
+          model: db.Book,
+          as: "book",
+          attributes: [["book_id", "id"], "title"],
+        },
+        {
+          model: db.Member,
+          as: "member",
+          attributes: [["member_id", "id"], "name"],
+        },
       ],
     });
     res
@@ -164,4 +173,4 @@ export const getLoanById = async (
     console.error("Error fetching loan:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};

@@ -2,6 +2,7 @@ import db from "../models";
 import { Request, Response } from "express";
 import { ResponseBuilder } from "../utils/reponseBuilder";
 import { epochToDate } from "../utils/epochToDateConverter";
+import { Op } from "sequelize";
 
 export const getMembers = async (
   req: Request,
@@ -9,9 +10,22 @@ export const getMembers = async (
 ): Promise<void> => {
   try {
     const members = await db.Member.findAll({
+      attributes: [["member_id", "id"], "name", "join_date"],
       include: [
         {
           model: db.Loan,
+          where: {
+            return_date: {
+              [Op.is]: null,
+            },
+          },
+          required: false, // This makes the join optional
+          attributes: [
+            ["loan_id", "id"],
+            "book_id",
+            "loan_date",
+            "return_date",
+          ],
         },
       ],
     });
@@ -35,11 +49,9 @@ export const createMembers = async (
       return;
     }
 
-    const convertedTime = epochToDate(joinDate);
-
     const newMember = await db.Member.create({
       name,
-      join_date: new Date(convertedTime),
+      join_date: new Date(epochToDate(joinDate)),
     });
 
     res
@@ -72,7 +84,7 @@ export const updateMember = async (
     }
 
     member.name = name;
-    member.join_date = joinDate;
+    member.join_date = new Date(epochToDate(joinDate));
     await member.save();
 
     res

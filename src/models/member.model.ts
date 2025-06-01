@@ -5,6 +5,7 @@ interface MemberAttributes {
   member_id: number;
   name: string;
   join_date: Date;
+  // return_date?: Date | null;
 }
 
 interface MemberCreationAttributes
