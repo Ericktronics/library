@@ -6,7 +6,6 @@ import db from "./models";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
-``;
 // Test the connection
 const connectToDB = async () => {
   try {
